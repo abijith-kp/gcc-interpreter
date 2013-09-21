@@ -1,7 +1,11 @@
+## Author: Abijith K P
+## Email Id: abijithkp@yahoo.co.in
+## Program: gcc interpreter on top of gcc compiler
+
 #!/bin/bash
 
 function intro() {
-	echo -e "\nA simple gcc compiler\n"
+	echo -e "\ngcc interpreter on top of gcc compiler\n"
 }
 
 ## a function that sanitises the input command and checks wheather the input is a function, header file or statement etc and add them accordingly to the file. This can be implemented using a parser made in lex/yacc.
@@ -78,7 +82,6 @@ while true  ## for runnning it infinitely until exit is given
 do
         read -r -p "gcc> " cmd   ## read the input command
 
-        echo $cmd
         if [ "$cmd" == "exit" ]
         then
                 echo -e "\nExiting... Bye...\n"

@@ -2,14 +2,10 @@
 
 void main() {
 
+printf("sfds\nsdfd\n");
+printf("sfds\nsdfd\ndfssdfdsfffffffff\n");
 int a;
-printf("sdfsdf");
-printf("sdfsdf\nsdfsd\n");
-a = 2;
-printf("sdfsdf\n%d\nsdfdsqqqqq\n", a);
-
-
-
-
-
+a = 4+2;
+printf("\n%d\n", a);
+printf("sfds\nsdfd\n");
 }
