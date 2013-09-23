@@ -11,6 +11,8 @@ void yyerror(const char *);
 %token	XOR_ASSIGN OR_ASSIGN
 %token	TYPEDEF_NAME ENUMERATION_CONSTANT
 
+%token CPP_INCLUDE
+
 %token	TYPEDEF EXTERN STATIC AUTO REGISTER INLINE
 %token	CONST RESTRICT VOLATILE
 %token	BOOL CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE VOID
@@ -512,9 +514,14 @@ jump_statement
 	;
 
 translation_unit
-	: external_declaration
+	: header_files external_declaration
 	| translation_unit external_declaration
 	;
+
+header_files
+        : CPP_INCLUDE
+        | header_files CPP_INCLUDE
+        ;
 
 external_declaration
 	: function_definition
