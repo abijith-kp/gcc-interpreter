@@ -459,6 +459,7 @@ statement
 	| selection_statement
 	| iteration_statement
 	| jump_statement
+        | function_definition
 	;
 
 labeled_statement
@@ -520,7 +521,7 @@ external_declaration
 	| declaration
 	;
 
-function_definition
+function_definition             /*             function definition should be included here               */
 	: declaration_specifiers declarator declaration_list compound_statement
 	| declaration_specifiers declarator compound_statement
 
