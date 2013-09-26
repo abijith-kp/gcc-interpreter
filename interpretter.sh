@@ -4,6 +4,8 @@
 
 #!/bin/bash
 
+headerLen=1
+
 function intro() {
 	echo -e "\ngcc interpreter on top of gcc compiler\n"
 }
@@ -16,26 +18,53 @@ function addStmnt() {
 
         if [ "$file" == "tmpFile.c" ]
         then
-                echo "cmd" >> $file
+                echo "$cmd" >> $file
         else
                 rm -f tmp.c
                 touch tmp.c
-               
+                tmpHeader=-1
+                flag=0
+
                 ## adding code from tmpFileTemplate.c to tmp.c
+
+                ##adding header files
+                if [[ "$cmd" =~ "#include "" "*"<"[a-zA-Z]+".h>" ]]
+                then
+                        tmpHeader=$headerLen
+                        headerLen=$(expr $headerLen + 1)
+                        flag=1
+                fi
+                
                 topPartN=$(expr $(cat $file | wc -l) - 1) ## number of lines to be copied
+
                 while read -r lines
                 do
-                        if [ $topPartN -eq 0 ]
+                        if [ $tmpHeader -eq 0 ]
                         then
+                                echo "$cmd" >> tmp.c
+                                tmpHeader=$(expr $tmpHeader - 1)
+                                ## continue
+                        elif [ $tmpHeader -gt 0 ]
+                        then 
+                                tmpHeader=$(expr $tmpHeader - 1)
+                        fi
+
+                        if [ $topPartN -eq 0 ]
+                        then                
                                 break
                         fi
                         echo "$lines" >> tmp.c
                         topPartN=$(expr $topPartN - 1)
                 done < $file
-                
-                echo "$cmd" >> tmp.c   ## adding the input command
+
+                if [ $flag -eq 0 ]
+                then
+                        echo "$cmd" >> tmp.c   ## adding the input command
+                fi
+
                 echo "}" >> tmp.c
                 ## mv tmp $1
+
 ####### this was done because: taking the top part excluding the "}" at the bottom and adding the input command and add the "}" bracket back and compile for result.
                 ## topPart=$(head -n"$(expr $(cat $1 | wc -l) - 1)" $1)
                 ## echo -e $topPart"\n$2""\n}"

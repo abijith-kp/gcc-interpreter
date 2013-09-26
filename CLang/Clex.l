@@ -85,7 +85,8 @@ static int check_type(void);
 "_Thread_local"                         { return THREAD_LOCAL; }
 "__func__"                              { return FUNC_NAME; }
 
-"#include" {WS}* "<" {L}* ".h>\n"                              { return CPP_INCLUDE; }
+"#include"{WS}*"<"{L}*".h>\n"                              { return CPP_INCLUDE; }
+"#include"{WS}*"\""{L}*".h\"\n"                              { return CPP_INCLUDE; }
 
 {L}{A}*					{ return check_type(); }
 
