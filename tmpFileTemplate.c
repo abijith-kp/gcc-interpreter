@@ -1,8 +1,7 @@
 #include <stdio.h>
-#include <math.h>
+#include <stdlib.h>
 
 void main() {
 
-printf("\nfsdfsdfkds\n");
-printf("\nfsdfsdfkds\nsdfsdfsdfdsfsdfsdf\n");
+printf("\nsdfhsdjf\n");
 }

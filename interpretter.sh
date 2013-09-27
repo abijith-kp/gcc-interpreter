@@ -10,6 +10,10 @@ function intro() {
 	echo -e "\ngcc interpreter on top of gcc compiler\n"
 }
 
+function checkStmnt() {
+        
+}
+
 ## a function that sanitises the input command and checks wheather the input is a function, header file or statement etc and add them accordingly to the file. This can be implemented using a parser made in lex/yacc.
 function addStmnt() {
         file=$1   ## filename to be appended into/ compiled
@@ -115,8 +119,13 @@ do
         then
                 echo -e "\nExiting... Bye...\n"
                 exit
+        elif [ "$cmd" == "\n" ]
+        then
+                continue
         fi
-
+        
+        checkStmnt $cmd
+        ## to check for the pattern in the input
         addStmnt $tmpFile $cmd          ## to add new statements into the internal program
         run "tmp.c" $tmpFile            ## run and check for error during compilation
 done
