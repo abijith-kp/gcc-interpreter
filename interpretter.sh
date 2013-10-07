@@ -5,13 +5,10 @@
 #!/bin/bash
 
 headerLen=1
+prevOutput=""
 
 function intro() {
 	echo -e "\ngcc interpreter on top of gcc compiler\n"
-}
-
-function checkStmnt() {
-        
 }
 
 ## a function that sanitises the input command and checks wheather the input is a function, header file or statement etc and add them accordingly to the file. This can be implemented using a parser made in lex/yacc.
@@ -76,13 +73,39 @@ function addStmnt() {
         fi
 }
 
+function checkOut() {
+        touch prevOutput
+
+        if [ -z $(cat prevOutput) ]
+        then
+                cat tmpOut
+                return
+        fi
+        cat "" > a
+        tail -n$(expr $(cat tmpOut | wc -l) - $(cat prevOutput | wc -l) + 1) tmpOut > a
+        lastLine=$(tail -n1 prevOutput)
+        line=$(echo $(head -n1 a) | sed -e 's/$lastLine//')
+        echo -e $line$(tail -n$(expr $(cat a | wc -l) -1) a)
+        ## head -n1 tmp | sed -e 's/$(tail -n1 prevOutput)//' > x
+        ## tail -n$(expr $(cat tmpOut | wc -l) - 1) tmpOut >> x
+        ## cat x
+        ## val1=$(cat tmpOut)
+        ## val2=$(cat prevOutput)
+
+        ## echo -e $val1 | sed -e 's/$val2//'
+}
+
 function run() {
         gcc $1
         if [ -f a.out ]  ## new a.out file will only be created if the compilation is successful
         then             ## if successful
                 mv $1 $2
-                ./a.out
-                rm -f a.out
+                ./a.out ## > tmpOut
+                ## tail -n$(expr $(cat tmpOut | wc -l) - $(cat prevOutput | wc -l)) tmpOut
+                ## checkOut tmpOut prevOutput
+                ## cat tmpOut > prevOutput
+                ## echo -e "\n" >> prevOutput                
+                rm -f a.out tmpOut tmp x
         else             ## else rm the tmp.c file which contains the errornous code and continue with the old one
                 rm $1
         fi
@@ -94,6 +117,8 @@ intro   ## for giving introduction message
 
 arg=$1
 tmpFile=""
+
+touch prevOutput
 
 if [ -z $arg ]
 then
@@ -124,7 +149,6 @@ do
                 continue
         fi
         
-        checkStmnt $cmd
         ## to check for the pattern in the input
         addStmnt $tmpFile $cmd          ## to add new statements into the internal program
         run "tmp.c" $tmpFile            ## run and check for error during compilation
