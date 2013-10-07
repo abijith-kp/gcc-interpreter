@@ -74,25 +74,26 @@ function addStmnt() {
 }
 
 function checkOut() {
-        touch prevOutput
-
-        if [ -z $(cat prevOutput) ]
+        if [ ! -f $2 ]
         then
-                cat tmpOut
+                cat $1
                 return
         fi
-        cat "" > a
-        tail -n$(expr $(cat tmpOut | wc -l) - $(cat prevOutput | wc -l) + 1) tmpOut > a
-        lastLine=$(tail -n1 prevOutput)
-        line=$(echo $(head -n1 a) | sed -e 's/$lastLine//')
-        echo -e $line$(tail -n$(expr $(cat a | wc -l) -1) a)
-        ## head -n1 tmp | sed -e 's/$(tail -n1 prevOutput)//' > x
-        ## tail -n$(expr $(cat tmpOut | wc -l) - 1) tmpOut >> x
-        ## cat x
-        ## val1=$(cat tmpOut)
-        ## val2=$(cat prevOutput)
 
-        ## echo -e $val1 | sed -e 's/$val2//'
+        len1=$(cat $1 | wc -l)
+        len2=$(cat $2 | wc -l)
+
+        cat $1 | tail -n$(expr $len1 - $len2 + 1) > tmp1
+        line1=$(tail -n1 $2)
+        line2=$(head -n1 tmp1)
+        out=$(echo $line1 | sed -e "s/$line2//")
+        
+        if [ ! -z $out ]
+        then
+                echo -e $out
+        fi
+        rm tmp1
+        cat $1 | tail -n$(expr $len1 - $len2)
 }
 
 function run() {
@@ -100,12 +101,11 @@ function run() {
         if [ -f a.out ]  ## new a.out file will only be created if the compilation is successful
         then             ## if successful
                 mv $1 $2
-                ./a.out ## > tmpOut
-                ## tail -n$(expr $(cat tmpOut | wc -l) - $(cat prevOutput | wc -l)) tmpOut
-                ## checkOut tmpOut prevOutput
-                ## cat tmpOut > prevOutput
+                ./a.out > tmpOut
+                checkOut tmpOut prevOutput
+                cat tmpOut > prevOutput
                 ## echo -e "\n" >> prevOutput                
-                rm -f a.out tmpOut tmp x
+                rm -f a.out tmpOut
         else             ## else rm the tmp.c file which contains the errornous code and continue with the old one
                 rm $1
         fi
@@ -118,7 +118,7 @@ intro   ## for giving introduction message
 arg=$1
 tmpFile=""
 
-touch prevOutput
+rm -f prevOutput
 
 if [ -z $arg ]
 then
