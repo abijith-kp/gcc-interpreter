@@ -2,10 +2,6 @@
 
 void main() {
 
-printf("\nsdfsdfsdfsd\nsdfsdfsd\n");
-printf("\nsdfsdfsdfsd\nsdfsdfsd\n");
-printf("\nsdfsdfsdfsd\nsdfsdfsd\n");
-printf("\nsdfsdfs\n");
-printf("sdfsdfsd\nsdfsdf");
 int a;
+printf("\nsdfgsd\n");
 }

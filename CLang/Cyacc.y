@@ -514,7 +514,8 @@ jump_statement
 	;
 
 translation_unit
-	: header_files external_declaration
+	: header_files 
+        | external_declaration
 	| translation_unit external_declaration
 	;
 
@@ -543,7 +544,7 @@ declaration_list
 void yyerror(const char *s)
 {
 	fflush(stdout);
-	fprintf(stderr, "*** %s\n", s);
+	printf("*** %s\n", s);
 }
 
 int main(void)

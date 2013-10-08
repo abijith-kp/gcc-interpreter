@@ -19,16 +19,26 @@ function addStmnt() {
 
         if [ "$file" == "tmpFile.c" ]
         then
-                echo "$cmd" >> $file
+                cat "$cmd" >> $file
         else
-                rm -f tmp.c
-                touch tmp.c
-                tmpHeader=-1
                 flag=0
+                
+                ## should remove this hard coded value
+                if [ "$file" == "tmpFileTemplate.c" ]
+                then
+                        rm -f tmp.c
+                        touch tmp.c
+                        tmpHeader=-1
+                else
+                        rm -f tmpp.c
+                        touch tmpp.c
+                        tmpHeaderT=-1
+                fi
 
                 ## adding code from tmpFileTemplate.c to tmp.c
 
                 ##adding header files
+                cmd=$(cat $cmd)
                 if [[ "$cmd" =~ "#include "" "*"<"[a-zA-Z]+".h>" ]]
                 then
                         tmpHeader=$headerLen
@@ -70,6 +80,10 @@ function addStmnt() {
                 ## topPart=$(head -n"$(expr $(cat $1 | wc -l) - 1)" $1)
                 ## echo -e $topPart"\n$2""\n}"
                 ## echo $topPart"\n$2""\n}" > $1
+        ## else
+        ##        len=$(cat $file | wc -l)
+        ##
+        ##        tail -n$(expr $len - 3)
         fi
 }
 
@@ -82,10 +96,14 @@ function checkOut() {
 
         len1=$(cat $1 | wc -l)
         len2=$(cat $2 | wc -l)
-
+        
         cat $1 | tail -n$(expr $len1 - $len2 + 1) > tmp1
         line1=$(tail -n1 $2)
         line2=$(head -n1 tmp1)
+        if [ -z "$line2" ]
+        then
+                line2="@#$"
+        fi
         out=$(echo $line1 | sed -e "s/$line2//")
         
         if [ ! -z $out ]
@@ -117,8 +135,9 @@ intro   ## for giving introduction message
 
 arg=$1
 tmpFile=""
+prompt="gcc> "
 
-rm -f prevOutput
+rm -f prevOutput tmpF
 
 if [ -z $arg ]
 then
@@ -136,9 +155,11 @@ else
         exit
 fi
 
+cp tmpFileTemplate.c.backup tmpFF
+
 while true  ## for runnning it infinitely until exit is given
 do
-        read -r -p "gcc> " cmd   ## read the input command
+        read -r -p "$prompt" cmd   ## read the input command
 
         if [ "$cmd" == "exit" ]
         then
@@ -149,7 +170,23 @@ do
                 continue
         fi
         
+        echo "$cmd" >> tmpF
+        addStmnt tmpFF tmpF
+        out=$(./CLang/CLang < tmpFF)
+        cat tmpF
+
+        if [ -z "$out" ]
+        then
+                prompt="gcc> "
+                ## to check for the pattern in the input
+                addStmnt $tmpFile tmpF          ## to add new statements into the internal program
+                run "tmp.c" $tmpFile            ## run and check for error during compilation
+                rm tmpF
+        else
+                prompt="... "
+        fi
+
         ## to check for the pattern in the input
-        addStmnt $tmpFile $cmd          ## to add new statements into the internal program
-        run "tmp.c" $tmpFile            ## run and check for error during compilation
+        ## addStmnt $tmpFile $cmd          ## to add new statements into the internal program
+        ## run "tmp.c" $tmpFile            ## run and check for error during compilation
 done
