@@ -4,8 +4,8 @@
 
 #!/bin/bash
 
-headerLen=1
-prevOutput=""
+HEADERLEN=1
+PREVOUTPUT=""
 
 function intro() {
 	echo -e "\ngcc interpreter on top of gcc compiler\n"
@@ -13,54 +13,54 @@ function intro() {
 
 ## a function that sanitises the input command and checks wheather the input is a function, header file or statement etc and add them accordingly to the file. This can be implemented using a parser made in lex/yacc.
 function addStmnt() {
-        file=$1   ## filename to be appended into/ compiled
+        FILE=$1   ## filename to be appended into/ compiled
         shift     ## to shift the input arguements
-        cmd="$@"  ## remaining arguements will be the new command to be appended
+        CMD="$@"  ## remaining arguements will be the new command to be appended
 
-        if [ "$file" == "tmpFile.c" ]
+        if [ "$FILE" == "tmpFile.c" ]
         then
-                echo "$cmd" >> $file
+                echo "$CMD" >> $FILE
         else
                 rm -f tmp.c
                 touch tmp.c
-                tmpHeader=-1
-                flag=0
+                TMPHEADER=-1
+                FLAG=0
 
                 ## adding code from tmpFileTemplate.c to tmp.c
 
                 ##adding header files
-                if [[ "$cmd" =~ "#include "" "*"<"[a-zA-Z]+".h>" ]]
+                if [[ "$CMD" =~ "#include "" "*"<"[a-zA-Z]+".h>" ]]
                 then
-                        tmpHeader=$headerLen
-                        headerLen=$(expr $headerLen + 1)
-                        flag=1
+                        TMPHEADER=$HEADERLEN
+                        HEADERLEN=$(expr $HEADERLEN + 1)
+                        FLAG=1
                 fi
                 
-                topPartN=$(expr $(cat $file | wc -l) - 1) ## number of lines to be copied
+                TOPPARTN=$(expr $(cat $FILE | wc -l) - 1) ## number of lines to be copied
 
                 while read -r lines
                 do
-                        if [ $tmpHeader -eq 0 ]
+                        if [ $TMPHEADER -eq 0 ]
                         then
-                                echo "$cmd" >> tmp.c
-                                tmpHeader=$(expr $tmpHeader - 1)
+                                echo "$CMD" >> tmp.c
+                                TMPHEADER=$(expr $TMPHEADER - 1)
                                 ## continue
-                        elif [ $tmpHeader -gt 0 ]
+                        elif [ $TMPHEADER -gt 0 ]
                         then 
-                                tmpHeader=$(expr $tmpHeader - 1)
+                                TMPHEADER=$(expr $TMPHEADER - 1)
                         fi
 
-                        if [ $topPartN -eq 0 ]
+                        if [ $TOPPARTN -eq 0 ]
                         then                
                                 break
                         fi
                         echo "$lines" >> tmp.c
-                        topPartN=$(expr $topPartN - 1)
-                done < $file
+                        TOPPARTN=$(expr $TOPPARTN - 1)
+                done < $FILE
 
-                if [ $flag -eq 0 ]
+                if [ $FLAG -eq 0 ]
                 then
-                        echo "$cmd" >> tmp.c   ## adding the input command
+                        echo "$CMD" >> tmp.c   ## adding the input command
                 fi
 
                 echo "}" >> tmp.c
@@ -115,21 +115,21 @@ function run() {
 
 intro   ## for giving introduction message
 
-arg=$1
-tmpFile=""
+ARG=$1
+TMPFILE=""
 
 rm -f prevOutput
 
-if [ -z $arg ]
+if [ -z $ARG ]
 then
-        tmpFile="tmpFile.c"   ## initially nothing will be there in the file
-        rm -f $tmpFile
-        touch $tmpFile
-elif [ "$arg" == "-template" ]
+        TMPFILE="tmpFile.c"   ## initially nothing will be there in the file
+        rm -f $TMPFILE
+        touch $TMPFILE
+elif [ "$ARG" == "-template" ]
 then
-        tmpFile="tmpFileTemplate.c"
-        rm -f $tmpFile
-        cp $tmpFile".backup" $tmpFile
+        TMPFILE="tmpFileTemplate.c"
+        rm -f $TMPFILE
+        cp $TMPFILE".backup" $TMPFILE
 	## initially a small template including stdio.h and void main statement will be there in the file
 else
         echo -e "\nERROR: Unknown arguements\nexiting...\n"
@@ -138,18 +138,18 @@ fi
 
 while true  ## for runnning it infinitely until exit is given
 do
-        read -r -p "gcc> " cmd   ## read the input command
+        read -r -p "gcc> " CMD   ## read the input command
 
-        if [ "$cmd" == "exit" ]
+        if [ "$CMD" == "exit" ]
         then
                 echo -e "\nExiting... Bye...\n"
                 exit
-        elif [ "$cmd" == "\n" ]
+        elif [ "$CMD" == "\n" ]
         then
                 continue
         fi
         
         ## to check for the pattern in the input
-        addStmnt $tmpFile $cmd          ## to add new statements into the internal program
-        run "tmp.c" $tmpFile            ## run and check for error during compilation
+        addStmnt $TMPFILE $CMD          ## to add new statements into the internal program
+        run "tmp.c" $TMPFILE            ## run and check for error during compilation
 done
