@@ -86,8 +86,9 @@ function checkOut() {
         cat $1 | tail -n$(expr $len1 - $len2 + 1) > tmp1
         line1=$(tail -n1 $2)
         line2=$(head -n1 tmp1)
+
         out=$(echo $line1 | sed -e "s/$line2//")
-        
+
         if [ ! -z $out ]
         then
                 echo -e $out
@@ -112,6 +113,13 @@ function run() {
 }
 
 ##################### program starts here ###########################
+
+## check if rlwrap is installed
+if [[ $(find /usr/bin/ -name "rlwrap") == "" ]]
+then
+        echo "ERROR: Install rlwrap before running gcc-interpreter!!!\n"
+        exit
+fi
 
 intro   ## for giving introduction message
 
@@ -138,18 +146,21 @@ fi
 
 while true  ## for runnning it infinitely until exit is given
 do
-        read -r -p "gcc> " CMD   ## read the input command
+        read -e -r -p "gcc> " CMD   ## read the input command
 
         if [ "$CMD" == "exit" ]
         then
                 echo -e "\nExiting... Bye...\n"
                 exit
-        elif [ "$CMD" == "\n" ]
+        elif [ "$CMD" == "" ]
         then
+                ## echo -e "\n"
                 continue
         fi
         
         ## to check for the pattern in the input
         addStmnt $TMPFILE $CMD          ## to add new statements into the internal program
         run "tmp.c" $TMPFILE            ## run and check for error during compilation
+
+        ## echo -e "\n"
 done

@@ -15,9 +15,20 @@ Features
   * All variable and functions included will be defined inside the main function. 
     Something like the global scope will be defined inside the main function
 
+  * History and in line editing support provided by rlwrap
+
+Dependencies
+============
+  
+  * rlwrap (readline wrapper need to be installed before using this tool)
+        in Arch Linux: **pacman -S rlwrap**
+
+
 To-Do
 =====
 
   * Parsing functions individually
+  
+  * Getting inputs via scanf and all
 
-  * Prevent the program from generating output when on output statements are given as input.
+  * Prevent the program from generating output when no output statements are given as input

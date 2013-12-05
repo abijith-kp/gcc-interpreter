@@ -1,3 +1,2 @@
-printf("\nsdfsdf\n");
-main() {
-q
+d
+printf("sdfdf");
