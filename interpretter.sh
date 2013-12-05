@@ -146,7 +146,7 @@ fi
 
 while true  ## for runnning it infinitely until exit is given
 do
-        read -e -r -p "gcc> " CMD   ## read the input command
+        read -r -p "gcc> " CMD   ## read the input command
 
         if [ "$CMD" == "exit" ]
         then
