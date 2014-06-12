@@ -31,4 +31,6 @@ To-Do
   
   * Getting inputs via scanf and all
 
+  * Error in sed command call when the first input statement do not produce any output. The error comes from the second input statement onwards till any statement that gives an output is given as the input.
+
   * Prevent the program from generating output when no output statements are given as input

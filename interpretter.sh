@@ -6,6 +6,8 @@
 
 HEADERLEN=1
 PREVOUTPUT=""
+GLOBALCMD=""
+GLOBALNUM=0
 
 function intro() {
 	echo -e "\ngcc interpreter on top of gcc compiler\n"
@@ -16,6 +18,7 @@ function addStmnt() {
         FILE=$1   ## filename to be appended into/ compiled
         shift     ## to shift the input arguements
         CMD="$@"  ## remaining arguements will be the new command to be appended
+        GLOBALCMD="$CMD"
 
         if [ "$FILE" == "tmpFile.c" ]
         then
@@ -86,8 +89,13 @@ function checkOut() {
         cat $1 | tail -n$(expr $len1 - $len2 + 1) > tmp1
         line1=$(tail -n1 $2)
         line2=$(head -n1 tmp1)
-
-        out=$(echo $line1 | sed -e "s/$line2//")
+        
+        if [ ! -z "$line2" ]
+        then
+                out=$(echo $line1 | sed -e "s/$line2//")
+        else
+                out=""
+        fi
 
         if [ ! -z $out ]
         then
@@ -97,22 +105,50 @@ function checkOut() {
         cat $1 | tail -n$(expr $len1 - $len2)
 }
 
+## checkCont returns true if the current input string is the ending of a function definition or function call.
+##              ie, the point at which all the opened brackets are clossed
+function checkCont() {
+         echo "sfdsfdsfdsfd"
+         NUM=$(expr $(echo -n $a | grep -o -G "[({\[]" | wc -m) / 2)
+         RNUM=$(expr $(echo -n $a | grep -o -G "[)}\]]" | wc -m) / 2)
+         GLOBALNUM=$(expr $GLOBALNUM + $NUM - $RNUM)
+         
+         if [ $GLOBALNUM == 0 ]
+         then
+                 return 0
+         else
+                 return 1
+         fi
+}
+
 function run() {
         gcc $1
+        ## echo "sfdsfdsfdsfd"i
+
         if [ -f a.out ]  ## new a.out file will only be created if the compilation is successful
-        then             ## if successful
+        then             ## if successfu<F5>l
                 mv $1 $2
                 ./a.out > tmpOut
                 checkOut tmpOut prevOutput
                 cat tmpOut > prevOutput
                 ## echo -e "\n" >> prevOutput                
                 rm -f a.out tmpOut
+                PROMPT="gcc> "
+                ## echo "00000000sfdsfdsfdsfd"
+        elif [ checkCont ]
+        then
+                ## echo "1111111sfdsfdsfdsfd"
+                PROMPT=".... "
         else             ## else rm the tmp.c file which contains the errornous code and continue with the old one
+                ## echo "2222222sfdsfdsfdsfd"
                 rm $1
         fi
 }
 
-##################### program starts here ###########################
+#####################################################################
+#####################################################################
+#####################################################################
+##################### program starts here ########################### 
 
 ## check if rlwrap is installed
 if [[ $(find /usr/bin/ -name "rlwrap") == "" ]]
@@ -125,6 +161,7 @@ intro   ## for giving introduction message
 
 ARG=$1
 TMPFILE=""
+PROMPT="gcc> "
 
 rm -f prevOutput
 
@@ -146,7 +183,7 @@ fi
 
 while true  ## for runnning it infinitely until exit is given
 do
-        read -r -p "gcc> " CMD   ## read the input command
+        read -r -p "$PROMPT" CMD   ## read the input command
 
         if [ "$CMD" == "exit" ]
         then
